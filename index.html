@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>StreamTube</title>
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+/>
+
+<title>StreamTube Ultimate</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -26,30 +31,35 @@ rel="stylesheet"
 STREAMTUBE
 </div>
 
-<div class="search-area">
+<div class="search-box">
 
 <input
 type="text"
 id="searchInput"
-placeholder="Pesquisar vídeos..."
->
+placeholder="Pesquisar QUALQUER vídeo do canal..."
+oninput="searchVideos()"
+/>
 
-<button onclick="searchVideos()">
-Pesquisar
+<button onclick="clearSearch()">
+Limpar
 </button>
 
 </div>
 
 <div class="header-buttons">
 
-<button onclick="toggleFavorites()">
+<button onclick="showFavorites()">
 Favoritos
+</button>
+
+<button onclick="showAllVideos()">
+Todos
 </button>
 
 <a
 id="subscribeBtn"
-target="_blank"
 class="subscribe-btn"
+target="_blank"
 >
 Inscrever-se
 </a>
@@ -65,7 +75,7 @@ Inscrever-se
 <div class="hero-content">
 
 <h1 id="heroTitle">
-Carregando...
+Carregando canal...
 </h1>
 
 <p id="heroDescription"></p>
@@ -92,7 +102,7 @@ Carregando...
 
 </section>
 
-<section class="continue-section">
+<section>
 
 <h2>
 Continue Assistindo
@@ -107,8 +117,8 @@ id="continueWatching"
 
 <section>
 
-<h2>
-Vídeos Recentes
+<h2 id="catalogTitle">
+Todos os Vídeos
 </h2>
 
 <div
@@ -118,21 +128,14 @@ id="videoGrid"
 
 </section>
 
-<section>
-
-<h2>
-Vídeos Mais Antigos
-</h2>
-
-<div
-class="video-grid"
-id="oldVideoGrid"
-></div>
-
-</section>
-
 <div id="loading">
-Carregando vídeos...
+
+<div class="loader"></div>
+
+<p id="loadingText">
+Catalogando vídeos do canal...
+</p>
+
 </div>
 
 <script src="app.js"></script>
