@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>StreamTube</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link
+href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+rel="stylesheet"
+/>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+<div class="logo">
+STREAMTUBE
+</div>
+
+<div class="search-area">
+
+<input
+type="text"
+id="searchInput"
+placeholder="Pesquisar vídeos..."
+>
+
+<button onclick="searchVideos()">
+Pesquisar
+</button>
+
+</div>
+
+<div class="header-buttons">
+
+<button onclick="toggleFavorites()">
+Favoritos
+</button>
+
+<a
+id="subscribeBtn"
+target="_blank"
+class="subscribe-btn"
+>
+Inscrever-se
+</a>
+
+</div>
+
+</header>
+
+<section class="hero" id="hero">
+
+<div class="hero-overlay"></div>
+
+<div class="hero-content">
+
+<h1 id="heroTitle">
+Carregando...
+</h1>
+
+<p id="heroDescription"></p>
+
+<div class="hero-buttons">
+
+<button onclick="playCurrentVideo()">
+▶ Assistir
+</button>
+
+<button onclick="addFavorite()">
+❤ Favoritar
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="player-section">
+
+<div id="player"></div>
+
+</section>
+
+<section class="continue-section">
+
+<h2>
+Continue Assistindo
+</h2>
+
+<div
+class="horizontal-list"
+id="continueWatching"
+></div>
+
+</section>
+
+<section>
+
+<h2>
+Vídeos Recentes
+</h2>
+
+<div
+class="video-grid"
+id="videoGrid"
+></div>
+
+</section>
+
+<section>
+
+<h2>
+Vídeos Mais Antigos
+</h2>
+
+<div
+class="video-grid"
+id="oldVideoGrid"
+></div>
+
+</section>
+
+<div id="loading">
+Carregando vídeos...
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
