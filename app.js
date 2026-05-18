@@ -1,28 +1,67 @@
 const API_KEY = "AIzaSyDNHqERli0UuPqruQwd2UPIBg7nikrjqNE";
 const CHANNEL_ID = "UCFJvAGjel1N2QWyOu50pNeQ";
 
-let videos = [];
+let allVideos = [];
 let filteredVideos = [];
 let currentVideoIndex = 0;
+
 let player;
 
-async function fetchVideos(){
-
-showLoading(true);
+async function getUploadsPlaylist(){
 
 const url =
-`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&maxResults=50&order=date&type=video&key=${API_KEY}`;
+`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${CHANNEL_ID}&key=${API_KEY}`;
 
 const response = await fetch(url);
 
 const data = await response.json();
 
-videos = data.items;
-filteredVideos = videos;
+return data.items[0]
+.contentDetails
+.relatedPlaylists
+.uploads;
 
-renderVideos(videos);
+}
 
-setupHero(videos[0]);
+async function fetchAllVideos(){
+
+showLoading(true);
+
+const uploadsPlaylist =
+await getUploadsPlaylist();
+
+let nextPageToken = "";
+let loadedVideos = [];
+
+while(true){
+
+const url =
+`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylist}&maxResults=50&pageToken=${nextPageToken}&key=${API_KEY}`;
+
+const response = await fetch(url);
+
+const data = await response.json();
+
+loadedVideos.push(...data.items);
+
+document.getElementById('loadingText')
+.innerText =
+`Catalogando ${loadedVideos.length} vídeos...`;
+
+nextPageToken = data.nextPageToken;
+
+if(!nextPageToken){
+break;
+}
+
+}
+
+allVideos = loadedVideos;
+filteredVideos = allVideos;
+
+renderVideos(filteredVideos);
+
+setupHero(filteredVideos[0]);
 
 loadContinueWatching();
 
@@ -32,45 +71,36 @@ showLoading(false);
 
 }
 
-function showLoading(show){
-
-document.getElementById('loading').style.display =
-show ? 'flex' : 'none';
-
-}
-
-function renderVideos(videoList){
+function renderVideos(videos){
 
 const grid =
 document.getElementById('videoGrid');
 
-const oldGrid =
-document.getElementById('oldVideoGrid');
-
 grid.innerHTML = '';
-oldGrid.innerHTML = '';
 
-videoList.forEach((video,index)=>{
+videos.forEach((video,index)=>{
 
-const html = createVideoCard(video,index);
-
-if(index < 12){
-grid.innerHTML += html;
-}else{
-oldGrid.innerHTML += html;
-}
+grid.innerHTML += createCard(video,index);
 
 });
 
 }
 
-function createVideoCard(video,index){
+function createCard(video,index){
+
+const videoId =
+video.snippet.resourceId.videoId;
 
 return `
-<div class="video-card"
-onclick="playVideo(${index})">
 
-<img src="${video.snippet.thumbnails.high.url}">
+<div
+class="video-card"
+onclick="playVideo(${index})"
+>
+
+<img
+src="https://i.ytimg.com/vi/${videoId}/hqdefault.jpg"
+>
 
 <div class="video-info">
 
@@ -81,14 +111,18 @@ ${video.snippet.title}
 </div>
 
 </div>
+
 `;
 
 }
 
 function setupHero(video){
 
+const videoId =
+video.snippet.resourceId.videoId;
+
 document.getElementById('hero').style.backgroundImage =
-`url(${video.snippet.thumbnails.high.url})`;
+`url(https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg)`;
 
 document.getElementById('heroTitle').innerText =
 video.snippet.title;
@@ -122,9 +156,11 @@ function playVideo(index){
 
 currentVideoIndex = index;
 
-const video = filteredVideos[index];
+const video =
+filteredVideos[index];
 
-const videoId = video.id.videoId;
+const videoId =
+video.snippet.resourceId.videoId;
 
 player.loadVideoById(videoId);
 
@@ -169,13 +205,31 @@ document.getElementById('searchInput')
 .toLowerCase();
 
 filteredVideos =
-videos.filter(video =>
+allVideos.filter(video =>
 video.snippet.title
 .toLowerCase()
 .includes(term)
 );
 
 renderVideos(filteredVideos);
+
+document.getElementById('catalogTitle')
+.innerText =
+`Resultados: ${filteredVideos.length}`;
+
+}
+
+function clearSearch(){
+
+document.getElementById('searchInput').value = '';
+
+filteredVideos = allVideos;
+
+renderVideos(filteredVideos);
+
+document.getElementById('catalogTitle')
+.innerText =
+'Todos os Vídeos';
 
 }
 
@@ -188,48 +242,61 @@ document.getElementById('subscribeBtn').href =
 
 function addFavorite(){
 
-const video =
+const current =
 filteredVideos[currentVideoIndex];
 
 let favorites =
-JSON.parse(localStorage.getItem('favorites')) || [];
+JSON.parse(
+localStorage.getItem('favorites')
+) || [];
 
 const exists =
-favorites.find(v =>
-v.id.videoId === video.id.videoId
+favorites.find(video =>
+video.snippet.resourceId.videoId ===
+current.snippet.resourceId.videoId
 );
 
 if(!exists){
 
-favorites.push(video);
+favorites.unshift(current);
 
 localStorage.setItem(
 'favorites',
 JSON.stringify(favorites)
 );
 
-alert('Vídeo favoritado');
+alert('Favoritado');
 
 }
 
 }
 
-function toggleFavorites(){
+function showFavorites(){
 
 const favorites =
-JSON.parse(localStorage.getItem('favorites')) || [];
-
-if(favorites.length === 0){
-
-alert('Nenhum favorito');
-
-return;
-
-}
+JSON.parse(
+localStorage.getItem('favorites')
+) || [];
 
 filteredVideos = favorites;
 
 renderVideos(filteredVideos);
+
+document.getElementById('catalogTitle')
+.innerText =
+'Favoritos';
+
+}
+
+function showAllVideos(){
+
+filteredVideos = allVideos;
+
+renderVideos(filteredVideos);
+
+document.getElementById('catalogTitle')
+.innerText =
+'Todos os Vídeos';
 
 }
 
@@ -242,12 +309,13 @@ localStorage.getItem('continueWatching')
 
 continueList =
 continueList.filter(v =>
-v.id.videoId !== video.id.videoId
+v.snippet.resourceId.videoId !==
+video.snippet.resourceId.videoId
 );
 
 continueList.unshift(video);
 
-continueList = continueList.slice(0,10);
+continueList = continueList.slice(0,15);
 
 localStorage.setItem(
 'continueWatching',
@@ -273,10 +341,17 @@ localStorage.getItem('continueWatching')
 continueList.forEach((video,index)=>{
 
 container.innerHTML +=
-createVideoCard(video,index);
+createCard(video,index);
 
 });
 
 }
 
-fetchVideos();
+function showLoading(show){
+
+document.getElementById('loading').style.display =
+show ? 'flex' : 'none';
+
+}
+
+fetchAllVideos();
