@@ -1,6 +1,8 @@
 const API_KEY = "AIzaSyDNHqERli0UuPqruQwd2UPIBg7nikrjqNE";
 const CHANNEL_ID = "UCFJvAGjel1N2QWyOu50pNeQ";
 
+const MAX_VIDEOS = 300;
+
 let allVideos = [];
 let filteredVideos = [];
 let currentVideoIndex = 0;
@@ -23,7 +25,7 @@ return data.items[0]
 
 }
 
-async function fetchAllVideos(){
+async function fetchLimitedVideos(){
 
 showLoading(true);
 
@@ -33,7 +35,7 @@ await getUploadsPlaylist();
 let nextPageToken = "";
 let loadedVideos = [];
 
-while(true){
+while(loadedVideos.length < MAX_VIDEOS){
 
 const url =
 `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylist}&maxResults=50&pageToken=${nextPageToken}&key=${API_KEY}`;
@@ -46,7 +48,7 @@ loadedVideos.push(...data.items);
 
 document.getElementById('loadingText')
 .innerText =
-`Catalogando ${loadedVideos.length} vídeos...`;
+`Carregando ${Math.min(loadedVideos.length, MAX_VIDEOS)} de ${MAX_VIDEOS} vídeos...`;
 
 nextPageToken = data.nextPageToken;
 
@@ -56,7 +58,8 @@ break;
 
 }
 
-allVideos = loadedVideos;
+allVideos = loadedVideos.slice(0, MAX_VIDEOS);
+
 filteredVideos = allVideos;
 
 renderVideos(filteredVideos);
@@ -99,6 +102,7 @@ onclick="playVideo(${index})"
 >
 
 <img
+loading="lazy"
 src="https://i.ytimg.com/vi/${videoId}/hqdefault.jpg"
 >
 
@@ -229,7 +233,7 @@ renderVideos(filteredVideos);
 
 document.getElementById('catalogTitle')
 .innerText =
-'Todos os Vídeos';
+'Últimos 300 Vídeos';
 
 }
 
@@ -296,7 +300,7 @@ renderVideos(filteredVideos);
 
 document.getElementById('catalogTitle')
 .innerText =
-'Todos os Vídeos';
+'Últimos 300 Vídeos';
 
 }
 
@@ -354,4 +358,4 @@ show ? 'flex' : 'none';
 
 }
 
-fetchAllVideos();
+fetchLimitedVideos();
