@@ -1,5 +1,5 @@
-const API_KEY = "SUA_API_KEY";
-const CHANNEL_ID = "SEU_CHANNEL_ID";
+const API_KEY = "AIzaSyDNHqERli0UuPqruQwd2UPIBg7nikrjqNE";
+const CHANNEL_ID = "UCFJvAGjel1N2QWyOu50pNeQ";
 
 let videos = [];
 let filteredVideos = [];
