@@ -1,64 +1,29 @@
 const API_KEY = "AIzaSyDNHqERli0UuPqruQwd2UPIBg7nikrjqNE";
 const CHANNEL_ID = "UCFJvAGjel1N2QWyOu50pNeQ";
 
-const MAX_VIDEOS = 300;
-
 let allVideos = [];
 let filteredVideos = [];
 let currentVideoIndex = 0;
 
 let player;
 
-async function getUploadsPlaylist(){
-
-const url =
-`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${CHANNEL_ID}&key=${API_KEY}`;
-
-const response = await fetch(url);
-
-const data = await response.json();
-
-return data.items[0]
-.contentDetails
-.relatedPlaylists
-.uploads;
-
-}
-
-async function fetchLimitedVideos(){
+async function fetchRSSVideos(){
 
 showLoading(true);
 
-const uploadsPlaylist =
-await getUploadsPlaylist();
+try{
 
-let nextPageToken = "";
-let loadedVideos = [];
+const rssUrl =
+`https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
 
-while(loadedVideos.length < MAX_VIDEOS){
+const api =
+`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
 
-const url =
-`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylist}&maxResults=50&pageToken=${nextPageToken}&key=${API_KEY}`;
-
-const response = await fetch(url);
+const response = await ffetch(api;
 
 const data = await response.json();
 
-loadedVideos.push(...data.items);
-
-document.getElementById('loadingText')
-.innerText =
-`Carregando ${Math.min(loadedVideos.length, MAX_VIDEOS)} de ${MAX_VIDEOS} vídeos...`;
-
-nextPageToken = data.nextPageToken;
-
-if(!nextPageToken){
-break;
-}
-
-}
-
-allVideos = loadedVideos.slice(0, MAX_VIDEOS);
+allVideos = data.items;
 
 filteredVideos = allVideos;
 
@@ -69,6 +34,12 @@ setupHero(filteredVideos[0]);
 loadContinueWatching();
 
 loadSubscribeButton();
+
+}catch(error){
+
+alert('Erro ao carregar vídeos do RSS');
+
+}
 
 showLoading(false);
 
@@ -92,7 +63,7 @@ grid.innerHTML += createCard(video,index);
 function createCard(video,index){
 
 const videoId =
-video.snippet.resourceId.videoId;
+extractVideoId(video.link);
 
 return `
 
@@ -109,7 +80,7 @@ src="https://i.ytimg.com/vi/${videoId}/hqdefault.jpg"
 <div class="video-info">
 
 <h3>
-${video.snippet.title}
+${video.title}
 </h3>
 
 </div>
@@ -120,19 +91,29 @@ ${video.snippet.title}
 
 }
 
+function extractVideoId(url){
+
+const match =
+url.match(/v=([^&]+)/);
+
+return match ? match[1] : '';
+
+}
+
 function setupHero(video){
 
 const videoId =
-video.snippet.resourceId.videoId;
+extractVideoId(video.link);
 
 document.getElementById('hero').style.backgroundImage =
 `url(https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg)`;
 
 document.getElementById('heroTitle').innerText =
-video.snippet.title;
+video.title;
 
 document.getElementById('heroDescription').innerText =
-video.snippet.description;
+video.description
+.replace(/<[^>]*>/g,'');
 
 }
 
@@ -164,7 +145,7 @@ const video =
 filteredVideos[index];
 
 const videoId =
-video.snippet.resourceId.videoId;
+extractVideoId(video.link);
 
 player.loadVideoById(videoId);
 
@@ -201,25 +182,61 @@ playVideo(currentVideoIndex);
 
 }
 
-function searchVideos(){
+async function searchVideos(){
 
 const term =
 document.getElementById('searchInput')
 .value
-.toLowerCase();
+.trim();
 
-filteredVideos =
-allVideos.filter(video =>
-video.snippet.title
-.toLowerCase()
-.includes(term)
-);
+if(term === ''){
+
+filteredVideos = allVideos;
 
 renderVideos(filteredVideos);
 
 document.getElementById('catalogTitle')
 .innerText =
-`Resultados: ${filteredVideos.length}`;
+'Vídeos Recentes';
+
+return;
+
+}
+
+showLoading(true);
+
+try{
+
+const url =
+`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId=${CHANNEL_ID}&maxResults=50&q=${encodeURIComponent(term)}&key=${API_KEY}`;
+
+const response = await fetch(url);
+
+const data = await response.json();
+
+filteredVideos = data.items.map(item => {
+
+return {
+title:item.snippet.title,
+description:item.snippet.description,
+link:`https://www.youtube.com/watch?v=${item.id.videoId}`
+};
+
+});
+
+renderVideos(filteredVideos);
+
+document.getElementById('catalogTitle')
+.innerText =
+`Resultados para: "${term}"`;
+
+}catch(error){
+
+alert('Erro na pesquisa');
+
+}
+
+showLoading(false);
 
 }
 
@@ -233,7 +250,7 @@ renderVideos(filteredVideos);
 
 document.getElementById('catalogTitle')
 .innerText =
-'Últimos 300 Vídeos';
+'Vídeos Recentes';
 
 }
 
@@ -254,10 +271,12 @@ JSON.parse(
 localStorage.getItem('favorites')
 ) || [];
 
+const currentId =
+extractVideoId(current.link);
+
 const exists =
 favorites.find(video =>
-video.snippet.resourceId.videoId ===
-current.snippet.resourceId.videoId
+extractVideoId(video.link) === currentId
 );
 
 if(!exists){
@@ -300,7 +319,7 @@ renderVideos(filteredVideos);
 
 document.getElementById('catalogTitle')
 .innerText =
-'Últimos 300 Vídeos';
+'Vídeos Recentes';
 
 }
 
@@ -311,10 +330,12 @@ JSON.parse(
 localStorage.getItem('continueWatching')
 ) || [];
 
+const currentId =
+extractVideoId(video.link);
+
 continueList =
 continueList.filter(v =>
-v.snippet.resourceId.videoId !==
-video.snippet.resourceId.videoId
+extractVideoId(v.link) !== currentId
 );
 
 continueList.unshift(video);
@@ -358,4 +379,4 @@ show ? 'flex' : 'none';
 
 }
 
-fetchLimitedVideos();
+fetchRSSVideos();
