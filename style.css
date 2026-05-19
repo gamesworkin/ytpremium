@@ -294,3 +294,12 @@ width:100%;
 }
 
 }
+.header-buttons{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.header-buttons button{
+min-width:100px;
+}
