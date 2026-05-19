@@ -495,3 +495,20 @@ document.getElementById("loading").style.display =
 show ? "flex" : "none";
 
 }
+function handleLoginEnter(event){
+
+if(event.key === "Enter"){
+
+login();
+
+}
+
+}
+
+function logout(){
+
+localStorage.removeItem("streamtube_session");
+
+location.reload();
+
+}
