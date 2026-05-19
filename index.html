@@ -37,12 +37,15 @@ STREAMTUBE
 type="text"
 id="username"
 placeholder="Usuário"
+autocomplete="off"
 />
 
 <input
 type="password"
 id="password"
 placeholder="Senha"
+autocomplete="off"
+onkeypress="handleLoginEnter(event)"
 />
 
 <button onclick="login()">
@@ -81,3 +84,94 @@ Limpar
 <button onclick="showFavorites()">
 Favoritos
 </button>
+
+<button onclick="showAllVideos()">
+Todos
+</button>
+
+<a
+id="subscribeBtn"
+class="subscribe-btn"
+target="_blank"
+>
+Inscrever-se
+</a>
+
+</div>
+
+</header>
+
+<section class="hero" id="hero">
+
+<div class="hero-overlay"></div>
+
+<div class="hero-content">
+
+<h1 id="heroTitle">
+Carregando...
+</h1>
+
+<p id="heroDescription"></p>
+
+<div class="hero-buttons">
+
+<button onclick="playCurrentVideo()">
+▶ Assistir
+</button>
+
+<button onclick="addFavorite()">
+❤ Favoritar
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="player-section">
+
+<div id="player"></div>
+
+</section>
+
+<section>
+
+<h2>
+Continue Assistindo
+</h2>
+
+<div
+class="horizontal-list"
+id="continueWatching"
+></div>
+
+</section>
+
+<section>
+
+<h2 id="catalogTitle">
+Vídeos Recentes
+</h2>
+
+<div
+class="video-grid"
+id="videoGrid"
+></div>
+
+</section>
+
+<div id="loading">
+
+<div class="loader"></div>
+
+<p id="loadingText">
+Carregando vídeos...
+</p>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
