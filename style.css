@@ -77,6 +77,7 @@ position:relative;
 display:flex;
 align-items:flex-end;
 padding:70px;
+margin-top:80px;
 }
 
 .hero-overlay{
@@ -85,7 +86,7 @@ inset:0;
 background:linear-gradient(
 to top,
 rgba(0,0,0,0.98),
-rgba(0,0,0,0.25)
+rgba(0,0,0,0.2)
 );
 }
 
@@ -193,7 +194,7 @@ min-width:320px;
 position:fixed;
 inset:0;
 background:#000;
-display:flex;
+display:none;
 align-items:center;
 justify-content:center;
 flex-direction:column;
@@ -221,6 +222,56 @@ transform:rotate(360deg);
 #loading p{
 font-size:20px;
 font-weight:600;
+}
+
+#loginScreen{
+position:fixed;
+inset:0;
+background:#000;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999999;
+}
+
+.login-box{
+background:#111;
+padding:40px;
+border-radius:20px;
+display:flex;
+flex-direction:column;
+gap:15px;
+width:350px;
+border:1px solid #222;
+}
+
+.login-box h1{
+text-align:center;
+margin-bottom:10px;
+color:#ff0000;
+}
+
+.login-box input{
+padding:14px;
+border:none;
+border-radius:10px;
+background:#1a1a1a;
+color:white;
+}
+
+.login-box button{
+padding:14px;
+border:none;
+border-radius:10px;
+background:#ff0000;
+color:white;
+font-weight:700;
+cursor:pointer;
+}
+
+#loginError{
+color:red;
+text-align:center;
 }
 
 @media(max-width:768px){
