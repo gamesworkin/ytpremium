@@ -1,144 +1,29 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<div id="loginScreen">
 
-<head>
+<div class="login-box">
 
-<meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
-/>
-
-<title>StreamTube</title>
-
-<link rel="stylesheet" href="style.css">
-
-<link
-href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-rel="stylesheet"
-/>
-
-<script src="https://www.youtube.com/iframe_api"></script>
-
-</head>
-
-<body>
-
-<header class="topbar">
-
-<div class="logo">
+<h1>
 STREAMTUBE
-</div>
-
-<div class="search-box">
+</h1>
 
 <input
 type="text"
-id="searchInput"
-placeholder="Pesquisar nos últimos 300 vídeos..."
-oninput="searchVideos()"
+id="username"
+placeholder="Usuário"
 />
 
-<button onclick="clearSearch()">
-Limpar
+<input
+type="password"
+id="password"
+placeholder="Senha"
+/>
+
+<button onclick="login()">
+Entrar
 </button>
 
-</div>
-
-<div class="header-buttons">
-
-<button onclick="showFavorites()">
-Favoritos
-</button>
-
-<button onclick="showAllVideos()">
-Todos
-</button>
-
-<a
-id="subscribeBtn"
-class="subscribe-btn"
-target="_blank"
->
-Inscrever-se
-</a>
-
-</div>
-
-</header>
-
-<section class="hero" id="hero">
-
-<div class="hero-overlay"></div>
-
-<div class="hero-content">
-
-<h1 id="heroTitle">
-Carregando vídeos...
-</h1>
-
-<p id="heroDescription"></p>
-
-<div class="hero-buttons">
-
-<button onclick="playCurrentVideo()">
-▶ Assistir
-</button>
-
-<button onclick="addFavorite()">
-❤ Favoritar
-</button>
+<p id="loginError"></p>
 
 </div>
 
 </div>
-
-</section>
-
-<section class="player-section">
-
-<div id="player"></div>
-
-</section>
-
-<section>
-
-<h2>
-Continue Assistindo
-</h2>
-
-<div
-class="horizontal-list"
-id="continueWatching"
-></div>
-
-</section>
-
-<section>
-
-<h2 id="catalogTitle">
-Últimos 300 Vídeos
-</h2>
-
-<div
-class="video-grid"
-id="videoGrid"
-></div>
-
-</section>
-
-<div id="loading">
-
-<div class="loader"></div>
-
-<p id="loadingText">
-Carregando vídeos...
-</p>
-
-</div>
-
-<script src="app.js"></script>
-
-</body>
-</html>
